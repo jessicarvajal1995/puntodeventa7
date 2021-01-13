@@ -4,82 +4,49 @@ namespace App\Http\Controllers;
 
 use App\PurchaseDetails;
 use Illuminate\Http\Request;
+use App\Http\Request\PurchaseDetails\StoreRequest;
+use App\Http\Request\PurchaseDetails\UpdateRequest;
 
 class PurchaseDetailsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        //
+        $purchase_details = PurchaseDetails::get();
+        return view('admin.purchasedetails.index', compact('purchase_details'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        //
+        return view('admin.purchasedetails.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    
+    public function store(StoreRequest $request)
     {
-        //
+        PurchaseDetails::create($request->all());
+        return redirect()->route('purchase_details.index');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\PurchaseDetails  $purchaseDetails
-     * @return \Illuminate\Http\Response
-     */
-    public function show(PurchaseDetails $purchaseDetails)
+    public function show(PurchaseDetails $purchasedetails)
     {
-        //
+        return view('admin.purchasedetails.show', compact('purchasedetails'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\PurchaseDetails  $purchaseDetails
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(PurchaseDetails $purchaseDetails)
+    public function edit(PurchaseDetails $purchasedetails)
     {
-        //
+        return view('admin.purchasedetails.show', compact('purchasedetails'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\PurchaseDetails  $purchaseDetails
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, PurchaseDetails $purchaseDetails)
+    public function update(UpdateRequest $request, PurchaseDetails $purchasedetails)
     {
-        //
+        $purchasedetails->update($request->all());
+        return redirect()->route('purchase_details.index');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\PurchaseDetails  $purchaseDetails
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(PurchaseDetails $purchaseDetails)
+    
+    public function destroy(PurchaseDetails $purchasedetails)
     {
-        //
+        $purchasedetails->delete();
+        return redirect()->route('purchase_details.index');
     }
 }

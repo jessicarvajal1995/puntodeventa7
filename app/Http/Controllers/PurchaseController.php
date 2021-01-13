@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Purchase;
+use App\Provider;
 use Illuminate\Http\Request;
 use App\Http\Request\Purchase\StoreRequest;
 use App\Http\Request\Purchase\UpdateRequest;
@@ -17,23 +18,40 @@ class PurchaseController extends Controller
 
     public function create()
     {
-        return view('admin.purchase.create');
+        $providers = Provider::get();
+        $products = Product::where('status', 'ACTIVE')->get();
+        return view('admin.purchase.create', compact('providers', 'products'));
     }
 
     
     public function store(StoreRequest $request)
     {
-        Purchase::create($request->all());
+        $purchase = Purchase::create($request->all()+[
+            'user_id'=>Auth::user()->id,
+            'purchase_date'=>Carbon::now('America/Lima'),
+        ]);
+        foreach ($request->product_id as $key => $product){
+            $results[] = array("product_id"=>$request->product_id[$key], "quantity"=>$request->quantity[$key],
+            "price"=>$request->price[$key]);
+        }
+        $purchase->purchaseDetails()->createMany($results);
+        // VER VIDEO 8, el edit y store esta diferente
         return redirect()->route('purchases.index');
     }
 
     public function show(Purchase $purchase)
     {
-        return view('admin.purchase.show', compact('purchase'));
+        $sultotal = 0;
+        $purchaseDetails = $purchase->purchaseDetails;
+        foreach($purchaseDetails as $purchaseDetail){
+            $subtotal += $purchaseDetail->quantity * $purchaseDetail->price;
+        }
+        return view('admin.purchase.show', compact('purchase', 'purchaseDetails', 'subtotal'));
     }
 
     public function edit(Purchase $purchase)
     {
+        $providers = Provider::get();
         return view('admin.purchase.show', compact('purchase'));
     }
 
